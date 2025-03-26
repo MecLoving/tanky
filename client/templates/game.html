@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle in Progress | Tank Battle</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h2>Match: <span id="match-id">Loading...</span></h2>
+            <div class="player-info">
+                <div class="player-you">
+                    <span class="tank-icon your-color"></span>
+                    You (<span id="player-rating">1000</span>)
+                </div>
+                <div class="player-opponent">
+                    <span class="tank-icon opponent-color"></span>
+                    <span id="opponent-name">Opponent</span> (<span id="opponent-rating">1000</span>)
+                </div>
+            </div>
+            <div class="turn-indicator">
+                Current Turn: <span id="current-turn">Player 1</span>
+            </div>
+        </div>
+
+        <div class="game-board-container">
+            <canvas id="game-board" width="800" height="600"></canvas>
+            <div class="game-controls">
+                <button id="end-turn-btn" class="btn btn-primary">End Turn</button>
+                <div class="movement-points">
+                    Movement Points: <span id="movement-points">3/3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-log" id="game-log">
+            <!-- Combat logs will appear here -->
+        </div>
+    </div>
+
+    <script src="/static/js/game.js"></script>
+    <script>
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const matchId = new URLSearchParams(window.location.search).get('match_id');
+            const game = new HexGame('game-board', matchId);
+            game.init();
+        });
+    </script>
+</body>
+</html>
