@@ -1,31 +1,63 @@
 class Renderer:
     def __init__(self, game):
         self.game = game
+        self.hex_numbers = self._generate_hex_numbers()  # Permanent numbering
+        self.selected_tank = None
     
-    def draw(self):
-        """Draw the current game state"""
+    def _generate_hex_numbers(self):
+        """Generate permanent numbering for all hex positions"""
+        numbers = {}
+        number = 0
+        for r in range(-self.game.grid.radius, self.game.grid.radius + 1):
+            for q in range(-self.game.grid.radius, self.game.grid.radius + 1):
+                if (q, r) in self.game.grid.grid:
+                    numbers[(q, r)] = number
+                    number += 1
+        return numbers
+    
+    def draw(self, selected_tank_index=None):
+        """Draw the game state with permanent numbering"""
+        self.selected_tank = selected_tank_index
         print(f"Player {self.game.current_player}'s turn\n")
         
-        # Draw hex grid
         for r in range(-self.game.grid.radius, self.game.grid.radius + 1):
-            row = ""
+            indent = abs(r) * "  "
+            print(indent, end="")
+            
             for q in range(-self.game.grid.radius, self.game.grid.radius + 1):
                 if (q, r) in self.game.grid.grid:
                     hex = self.game.grid.grid[(q, r)]
                     tank = self._get_tank_at(hex)
+                    pos_number = self.hex_numbers[(q, r)]
+                    
                     if tank:
+                        # Highlight selected tank
+                        is_selected = (self.selected_tank is not None and 
+                                      self.game.tanks[self.selected_tank] == tank)
+                        
                         color = "\033[91m" if tank.player == 1 else "\033[94m"
-                        symbol = "T" + ("*" if tank.has_star else "")
-                        row += f"{color}{symbol}\033[0m "
+                        highlight = "\033[7m" if is_selected else ""
+                        symbol = f"{highlight}{color}T{'*' if tank.has_star else ''}\033[0m"
+                        print(f"{pos_number:2d}:{symbol}", end=" ")
                     else:
-                        row += ". "
+                        print(f"{pos_number:4d}", end=" ")
                 else:
-                    row += "  "
-            print(row)
+                    print("     ", end="")
+            print("\n")
+    
+    def get_hex_by_number(self, number):
+        """Get hex from permanent number"""
+        for coords, num in self.hex_numbers.items():
+            if num == number:
+                return self.game.grid.grid[coords]
+        return None
+    
+    def get_position_number(self, hex):
+        """Get permanent number for a hex position"""
+        return self.hex_numbers.get((hex.q, hex.r))
     
     def _get_tank_at(self, hex):
-        """Find tank at given hex position"""
         for tank in self.game.tanks:
-            if tank.position == hex:
+            if not tank.destroyed and tank.position == hex:
                 return tank
         return None
