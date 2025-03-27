@@ -44,3 +44,6 @@ class HexGrid:
             if neighbor_pos in self.grid:
                 neighbors.append(self.grid[neighbor_pos])
         return neighbors
+    def is_valid_position(self, q, r):
+        """Check if coordinates are within bounds"""
+        return (q, r) in self.grid

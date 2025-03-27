@@ -4,6 +4,7 @@ class Renderer:
         self.hex_numbers = self._generate_hex_numbers()  # Permanent numbering
         self.selected_tank = None
     
+    
     def _generate_hex_numbers(self):
         """Generate permanent numbering for all hex positions"""
         numbers = {}
@@ -15,10 +16,18 @@ class Renderer:
                     number += 1
         return numbers
     
+    def _get_tank_display(self, tank):
+        """Show movement status based on current rules"""
+        color = self.game.players[tank.player]['color']
+        moves_display = "∞" if (tank.has_star or 
+                            self.game.players[tank.player]['unlimited_moves']) \
+                        else tank.moves_remaining
+        symbol = f"T{tank.strength}{'*' if tank.has_star else ''}({moves_display})"
+        return f"{color}{symbol}\033[0m"
+    
     def draw(self, selected_tank_index=None):
-        """Draw the game state with permanent numbering"""
-        self.selected_tank = selected_tank_index
-        print(f"Player {self.game.current_player}'s turn\n")
+        print(f"Player {self.game.current_player}'s turn")
+        print(f"Movement Points: {self.game.players[self.game.current_player]['movement_points']}\n")
         
         for r in range(-self.game.grid.radius, self.game.grid.radius + 1):
             indent = abs(r) * "  "
